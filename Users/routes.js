@@ -1,8 +1,10 @@
 import Database from "../Database/index.js";
 function UsersRoutes(app) {
     app.post("/api/users", (req, res) => {
-        const user = { ...req.body,
-            _id: new Date().getTime().toString() };
+        const user = {
+            ...req.body,
+            _id: new Date().getTime().toString()
+        };
         Database.users.push(user);
         res.send(user);
     });
@@ -22,7 +24,7 @@ function UsersRoutes(app) {
         const { id } = req.params;
         const user = req.body;
         Database.users = Database.users.map((c) =>
-                                                    c._id === id ? { ...c, ...user } : c
+            c._id === id ? { ...c, ...user } : c
         );
         res.sendStatus(204);
     });
