@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     memberSince: Date,
     followers: Array,
     following: Array,
+    watchlist: Array,
 }, {collection: "users"});
 
 export default userSchema;

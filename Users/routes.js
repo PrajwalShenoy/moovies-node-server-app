@@ -3,12 +3,32 @@ import * as dao from "./dao.js";
 
 function UsersRoutes(app) {
 
+    const getCurrentDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    };
+
+    const generateUserId = () => {
+        const currentDate = new Date();
+        const uniqueNumber = Number(currentDate.toISOString().replace(/[^0-9]/g, ''));
+
+        return uniqueNumber;
+    };
+
     app.post("/api/users", (req, res) => {
         const user = {
             ...req.body,
-            _id: new Date().getTime().toString()
+            memberSince: getCurrentDate(),
+            id: generateUserId(),
+            followers: [],
+            following: [],
+            watchlist: []
         };
-        Database.users.push(user);
+        dao.createUser(user);
         res.send(user);
     });
 
@@ -16,7 +36,7 @@ function UsersRoutes(app) {
         const users = await dao.getAllUsers();
         res.send(users);
     };
-    
+
     const signinUser = async (req, res) => {
         const { username, password } = req.body;
         const currentUser = await dao.findUserByCredentials(username, password);
@@ -32,22 +52,22 @@ function UsersRoutes(app) {
     const getCurrentUser = (req, res) => {
         res.json(req.session['currentUser']);
     };
-    
+
     app.delete("/api/users/:id", (req, res) => {
         const { id } = req.params;
         Database.users = Database.users
-        .filter((c) => c._id !== id);
+            .filter((c) => c._id !== id);
         res.sendStatus(204);
     });
     app.put("/api/users/:id", (req, res) => {
         const { id } = req.params;
         const user = req.body;
         Database.users = Database.users.map((c) =>
-        c._id === id ? { ...c, ...user } : c
+            c._id === id ? { ...c, ...user } : c
         );
         res.sendStatus(204);
     });
-    
+
     // app.get("/api/users/:id", (req, res) => {
     //     const { id } = req.params;
     //     const user = Database.users
@@ -58,12 +78,12 @@ function UsersRoutes(app) {
     //     }
     //     res.send(user);
     // });
-    
+
     app.post("/api/users/signin", signinUser);
     app.get("/api/users/account", getCurrentUser);
     app.get("/api/users", getAllUsers);
     app.post("/api/users/signout", signoutUser);
-    
-    
+
+
 }
 export default UsersRoutes;
