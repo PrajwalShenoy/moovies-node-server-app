@@ -1,9 +1,11 @@
 import express from 'express'
 import Hello from "./hello.js"
 import UsersRoutes from "./Users/routes.js";
+import MoviesRoutes from "./Movies/routes.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
+import session from "express-session";
 
 const CONNECTION_STRING = process.env.DB_CONNECTION_STRING;
 
@@ -19,9 +21,21 @@ mongoose
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:3000"
+}));
+const sessionOptions = {
+    secret: "any string",
+    resave: false,
+    saveUninitialized: false,
+};
+app.use(
+    session(sessionOptions)
+);
 app.use(express.json());
-Hello(app)
-UsersRoutes(app)
+Hello(app);
+UsersRoutes(app);
+MoviesRoutes(app);
 app.listen(4000)
 
