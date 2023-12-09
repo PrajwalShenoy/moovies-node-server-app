@@ -93,7 +93,16 @@ function MoviesRoutes(app) {
         res.json(response.data);
     };
 
+    const getMovieById = async (req, res) => {
+        const { id } = req.params;
+        const response = await axios.get(`${BASE_URL}/movie/${id}`, {
+            headers
+        });
+        res.json(response.data);
+    }
+
     app.get("/api/movies/newmovies", getNewMovies);
+    app.get("/api/movies/:id", getMovieById);
     app.get("/api/movies/genre/action", getActionMovies);
     app.get("/api/movies/genre/comedy", getComedyMovies);
     app.get("/api/movies/genre/thriller", getThrillerMovies);
