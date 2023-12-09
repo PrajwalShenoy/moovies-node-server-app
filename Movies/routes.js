@@ -1,5 +1,6 @@
 import axios from 'axios';
 import "dotenv/config";
+import * as dao from "../Users/dao.js";
 
 function MoviesRoutes(app) {
 
@@ -101,6 +102,24 @@ function MoviesRoutes(app) {
         res.json(response.data);
     }
 
+    const addMovieToPlaylist = async (req, res) => {
+        const { movieId } = req.body;
+        console.log("Before adding to watchlist", req.session['currentUser']);
+        const { id } = req.session['currentUser'];
+        dao.addToWatchlist(id, movieId);
+        req.session['currentUser'].watchlist.push(movieId);
+        console.log("After adding to watchlist", req.session['currentUser']);
+        res.status(200).send("Movie added to watchlist");
+    }
+
+    const getWatchlist = async (req, res) => {
+        const { id } = req.session['currentUser'];
+        const response = await dao.getWatchlist(id);
+        res.json(response);
+    };
+
+    app.post("/api/watchlist", addMovieToPlaylist);
+    app.get("/api/watchlist", getWatchlist);
     app.get("/api/movies/newmovies", getNewMovies);
     app.get("/api/movies/:id", getMovieById);
     app.get("/api/movies/genre/action", getActionMovies);

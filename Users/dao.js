@@ -6,5 +6,12 @@ export const findUserByCredentials = (username, password) => {
 };
 export const createUser = (user) => model.create(user);
 export const addToWatchlist = (userId, movieId) => {
-    return model.updateOne({ id: userId }, { $push: { watchlist: movieId } });
+    console.log(userId, movieId);
+    return model.updateOne({ id: userId }, { $push: { watchlist: movieId } })
+    .then((response) => {
+        console.log(response);
+    });
 };
+export const getWatchlist = (userId) => {
+    return model.findOne({ id: userId }, { watchlist: 1, _id: 0 });
+}
