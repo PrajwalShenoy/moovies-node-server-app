@@ -50,7 +50,25 @@ function UsersRoutes(app) {
     };
 
     const getCurrentUser = (req, res) => {
+        if (req.session['currentUser']) {
+            req.session['currentUser'].following = req.session['currentUser'].following.map((f) => parseInt(f));
+            req.session['currentUser'].followers = req.session['currentUser'].followers.map((f) => parseInt(f));
+        }
         res.json(req.session['currentUser']);
+    };
+
+    const followUser = async (req, res) => {
+        const { userId, followId } = req.params;
+        dao.followUser(userId, followId);
+        req.session['currentUser'].following.push(followId);
+        res.status(200).send("User followed");
+    };
+
+    const unfollowUser = async (req, res) => {
+        const { userId, followId } = req.params;
+        dao.unfollowUser(userId, followId);
+        req.session['currentUser'].following = req.session['currentUser'].following.filter((f) => f !== followId);
+        res.status(200).send("User unfollowed");
     };
 
     app.delete("/api/users/:id", (req, res) => {
@@ -74,6 +92,8 @@ function UsersRoutes(app) {
     app.get("/api/users/account", getCurrentUser);
     app.get("/api/users", getAllUsers);
     app.post("/api/users/signout", signoutUser);
+    app.post("/api/users/:userId/follow/:followId", followUser);
+    app.post("/api/users/:userId/unfollow/:followId", unfollowUser);
 
     app.get("/api/users/:id", (req, res) => {
         const { id } = req.params;

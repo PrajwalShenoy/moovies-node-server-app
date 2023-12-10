@@ -117,12 +117,19 @@ function MoviesRoutes(app) {
 
     const addMovieToPlaylist = async (req, res) => {
         const { movieId } = req.body;
-        console.log("Before adding to watchlist", req.session['currentUser']);
         const { id } = req.session['currentUser'];
         dao.addToWatchlist(id, movieId);
         req.session['currentUser'].watchlist.push(movieId);
-        console.log("After adding to watchlist", req.session['currentUser']);
         res.status(200).send("Movie added to watchlist");
+    };
+
+    const removeMovieFromPlaylist = async (req, res) => {
+        console.log(req.params);
+        const { movieId } = req.params;
+        const { id } = req.session['currentUser'];
+        await dao.removeFromWatchlist(id, movieId);
+        req.session['currentUser'].watchlist = req.session['currentUser'].watchlist.filter((m) => m !== movieId);
+        res.status(200).send("Movie removed from watchlist");
     }
 
     const getWatchlist = async (req, res) => {
@@ -142,6 +149,7 @@ function MoviesRoutes(app) {
     };
 
     app.post("/api/watchlist", addMovieToPlaylist);
+    app.delete("/api/watchlist/:movieId", removeMovieFromPlaylist);
     app.get("/api/watchlist", getWatchlist);
     app.get("/api/watchlist/:id", getWatchlistDetails);
     app.get("/api/movies/newmovies", getNewMovies);
