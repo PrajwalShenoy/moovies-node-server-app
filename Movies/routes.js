@@ -94,13 +94,26 @@ function MoviesRoutes(app) {
         res.json(response.data);
     };
 
+    // const getMovieById = async (req, res) => {
+    //     const { id } = req.params;
+    //     const response = await axios.get(`${BASE_URL}/movie/${id}`, {
+    //         headers
+    //     });
+    //     res.json(response.data);
+    // }
+
     const getMovieById = async (req, res) => {
         const { id } = req.params;
+        const response = await helperGetMovieById(id);
+        res.json(response.data);
+    }
+
+    const helperGetMovieById = async (id) => {
         const response = await axios.get(`${BASE_URL}/movie/${id}`, {
             headers
         });
-        res.json(response.data);
-    }
+        return response;
+    };
 
     const addMovieToPlaylist = async (req, res) => {
         const { movieId } = req.body;
@@ -118,8 +131,20 @@ function MoviesRoutes(app) {
         res.json(response);
     };
 
+    const getWatchlistDetails = async (req, res) => {
+        const list = await dao.getWatchlist(req.params.id);
+        const response = [];
+        for (let i = 0; i < list['watchlist'].length; i++) {
+            const movie = await helperGetMovieById(list['watchlist'][i]);
+            console.log(movie.data);
+            response.push(movie.data);
+        }
+        res.json(response);
+    };
+
     app.post("/api/watchlist", addMovieToPlaylist);
     app.get("/api/watchlist", getWatchlist);
+    app.get("/api/watchlist/:id", getWatchlistDetails);
     app.get("/api/movies/newmovies", getNewMovies);
     app.get("/api/movies/:id", getMovieById);
     app.get("/api/movies/genre/action", getActionMovies);

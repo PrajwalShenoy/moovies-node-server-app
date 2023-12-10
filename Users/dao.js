@@ -14,4 +14,4 @@ export const addToWatchlist = (userId, movieId) => {
 };
 export const getWatchlist = (userId) => {
     return model.findOne({ id: userId }, { watchlist: 1, _id: 0 });
-}
+};
