@@ -42,3 +42,14 @@ export const unfollowUser = (userId, followId) => {
         console.log(response);
     });
 };
+
+export const getUserRoles = (userId) => {
+    return model.findOne({ id: userId }, { role: 1, _id: 0 });
+};
+
+export const updateUserCurrentRole = (userId, roles) => {
+    return model.updateOne({ id: userId }, { $set: { currentRole: roles } })
+    .then((response) => {
+        console.log(response);
+    });
+};

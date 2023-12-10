@@ -45,6 +45,7 @@ function UsersRoutes(app) {
     };
 
     const signoutUser = async (req, res) => {
+        dao.updateUserCurrentRole(req.session['currentUser'].id, req.session['currentUser'].currentRole);
         req.session.destroy();
         res.sendStatus(204);
     };
@@ -86,12 +87,29 @@ function UsersRoutes(app) {
         res.sendStatus(204);
     });
 
+    const getUserRoles = async (req, res) => {
+        const { userId } = req.params;
+        const user = await dao.getUserRoles(userId);
+        res.send(user);
+    };
+
+    const setCurrentRole = (req, res) => {
+        const { role } = req.body;
+        if (req.session['currentUser'].role.includes(role)) {
+            req.session['currentUser']["currentRole"] = role;
+            res.sendStatus(204);
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    };
 
 
+    app.get("/api/users/roles/:userId", getUserRoles);
     app.post("/api/users/signin", signinUser);
     app.get("/api/users/account", getCurrentUser);
     app.get("/api/users", getAllUsers);
     app.post("/api/users/signout", signoutUser);
+    app.post("/api/users/setrole", setCurrentRole);
     app.post("/api/users/:userId/follow/:followId", followUser);
     app.post("/api/users/:userId/unfollow/:followId", unfollowUser);
 

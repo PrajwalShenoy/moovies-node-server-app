@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     followers: Array,
     following: Array,
     watchlist: Array,
+    role: Array,
+    currentRole: String,
 }, {collection: "users"});
 
 export default userSchema;
