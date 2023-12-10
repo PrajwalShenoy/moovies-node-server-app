@@ -136,7 +136,6 @@ function MoviesRoutes(app) {
         const response = [];
         for (let i = 0; i < list['watchlist'].length; i++) {
             const movie = await helperGetMovieById(list['watchlist'][i]);
-            console.log(movie.data);
             response.push(movie.data);
         }
         res.json(response);
