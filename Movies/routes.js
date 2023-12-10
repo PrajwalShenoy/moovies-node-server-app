@@ -148,6 +148,22 @@ function MoviesRoutes(app) {
         res.json(response);
     };
 
+    const searchMovieRequest = async (req,res) => {
+        const {query} = req.query;
+        let params = {
+                    include_adult: false,
+                    language: "en-US",
+                    page: 1,
+                   query: query,
+                };
+            const response = await axios.get(`${BASE_URL}/search/movie`, {
+                headers,
+                params
+            });
+            console.log(response.data);
+            res.json(response.data);
+        };
+    app.get("/api/search",searchMovieRequest);
     app.post("/api/watchlist", addMovieToPlaylist);
     app.delete("/api/watchlist/:movieId", removeMovieFromPlaylist);
     app.get("/api/watchlist", getWatchlist);
