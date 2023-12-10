@@ -68,23 +68,23 @@ function UsersRoutes(app) {
         res.sendStatus(204);
     });
 
-    // app.get("/api/users/:id", (req, res) => {
-    //     const { id } = req.params;
-    //     const user = Database.users
-    //     .find((c) => c._id === id);
-    //     if (!user) {
-    //         res.status(404).send("User not found");
-    //         return;
-    //     }
-    //     res.send(user);
-    // });
+
 
     app.post("/api/users/signin", signinUser);
     app.get("/api/users/account", getCurrentUser);
     app.get("/api/users", getAllUsers);
     app.post("/api/users/signout", signoutUser);
 
-
+    app.get("/api/users/:id", (req, res) => {
+        const { id } = req.params;
+        const user = Database.users
+        .find((c) => c.id === parseInt(id));
+        if (!user) {
+            res.status(404).send("User not found");
+            return;
+        }
+        res.send(user);
+    });
 
 
 }
