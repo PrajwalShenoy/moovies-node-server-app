@@ -28,7 +28,9 @@ function UsersRoutes(app) {
             id: generateUnqueNumber(),
             followers: [],
             following: [],
-            watchlist: []
+            watchlist: [],
+            role: ["User"],
+            currentRole: "User"
         };
         dao.createUser(user);
         res.send(user);
@@ -47,9 +49,13 @@ function UsersRoutes(app) {
     };
 
     const signoutUser = async (req, res) => {
-        await dao.updateUserCurrentRole(req.session['currentUser'].id, req.session['currentUser'].currentRole);
-        req.session.destroy();
-        res.sendStatus(204);
+        try{
+            await dao.updateUserCurrentRole(req.session['currentUser'].id, req.session['currentUser'].currentRole);
+            req.session.destroy();
+            res.sendStatus(204);
+        } catch (error) {
+            res.status(200).json({ error: 'Internal Server Error' });
+        }
     };
 
     const getCurrentUser = (req, res) => {
@@ -175,10 +181,10 @@ function UsersRoutes(app) {
     
 
 
-    app.get("/api/users/:id", (req, res) => {
+    app.get("/api/users/:id", async (req, res) => {
         const { id } = req.params;
-        const user = Database.users
-        .find((c) => c.id === parseInt(id));
+        const users = await dao.getAllUsers();
+        const user = users.find((c) => c.id === parseInt(id));
         if (!user) {
             res.status(404).send("User not found");
             return;
@@ -210,6 +216,16 @@ function UsersRoutes(app) {
             const newReview = await dao.createReview(review);
             res.status(200).json(newReview);
 
+        } catch (error) {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    app.delete('/api/reviews/:reviewId', async (req, res) => {
+        try {
+            const { reviewId } = req.params;
+            const deletedReview = await dao.deleteReview(reviewId);
+            res.status(200).json(deletedReview);
         } catch (error) {
             res.status(500).json({ error: 'Internal Server Error' });
         }
