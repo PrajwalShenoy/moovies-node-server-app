@@ -19,6 +19,8 @@ function UsersRoutes(app) {
         return uniqueNumber;
     };
 
+
+
     app.post("/api/users", (req, res) => {
         const user = {
             ...req.body,
@@ -148,7 +150,16 @@ function UsersRoutes(app) {
         res.status(201).send(`Role removed - ${role}`);
     };
 
+    const updateUserInfo = async (req, res) => {
+        console.log("here");
+        const { userId } = req.params;
+        console.log("userID",userId);
+        console.log(req.body);
+        const status = await dao.updateUser(userId, req.body);
+        res.json(status);
+    };
 
+    app.put("/api/users/:userId", updateUserInfo);
     app.get("/api/requests", getAllPendingRequests);
     app.post("/api/requests", createRequest);
     app.post("/api/deleterole", removeUserRole);
@@ -161,6 +172,8 @@ function UsersRoutes(app) {
     app.post("/api/users/setrole", setCurrentRole);
     app.post("/api/users/:userId/follow/:followId", followUser);
     app.post("/api/users/:userId/unfollow/:followId", unfollowUser);
+
+
 
     app.get("/api/users/:id", (req, res) => {
         const { id } = req.params;

@@ -5,6 +5,11 @@ export const findUserByCredentials = (username, password) => {
     return userModel.findOne({ username: username, password: password });
 };
 export const createUser = (user) => userModel.create(user);
+
+export const updateUser = (userId, user) =>{
+    userModel.updateOne({ id: userId }, { $set: user });
+
+
 export const addToWatchlist = (userId, movieId) => {
     return userModel.updateOne({ id: userId }, { $push: { watchlist: movieId } })
     .then((response) => {
