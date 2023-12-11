@@ -12,7 +12,7 @@ function UsersRoutes(app) {
         return `${year}-${month}-${day}`;
     };
 
-    const generateUserId = () => {
+    const generateUnqueNumber = () => {
         const currentDate = new Date();
         const uniqueNumber = Number(currentDate.toISOString().replace(/[^0-9]/g, ''));
 
@@ -23,7 +23,7 @@ function UsersRoutes(app) {
         const user = {
             ...req.body,
             memberSince: getCurrentDate(),
-            id: generateUserId(),
+            id: generateUnqueNumber(),
             followers: [],
             following: [],
             watchlist: []
@@ -103,7 +103,49 @@ function UsersRoutes(app) {
         }
     };
 
+    const getAllPendingRequests = async (req, res) => {
+        const response = await dao.getRequests();
+        res.json(response);
+    };
 
+    const createRequest = async (req, res) => {
+        if (req.session['currentUser']) {
+            const { requestedRole } = req.body;
+            const request = {
+                id: generateUnqueNumber(),
+                userId: req.session['currentUser'].id,
+                firstName: req.session['currentUser'].firstName,
+                lastName: req.session['currentUser'].lastName,
+                username: req.session['currentUser'].username,
+                requestedRole: requestedRole,
+                completed: false
+            };
+            const response = await dao.createRequest(request);
+            if (response) {
+                res.status(201).json(request);
+            } else {
+                res.status(409).send("Request already exists");
+            }
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    };
+
+    const completeRequest = async (req, res) => {
+        if (req.session['currentUser'].role.includes("Admin")) {
+            const { requestId } = req.params;
+            const { approved } = req.body;
+            await dao.updateRequest(requestId, approved);
+            res.status(201).send(`Request marked as completed, access granted - ${approved}`);
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    }
+
+
+    app.get("/api/requests", getAllPendingRequests);
+    app.post("/api/requests", createRequest);
+    app.post("/api/requests/:requestId", completeRequest);
     app.get("/api/users/roles/:userId", getUserRoles);
     app.post("/api/users/signin", signinUser);
     app.get("/api/users/account", getCurrentUser);

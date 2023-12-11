@@ -15,4 +15,14 @@ const userSchema = new mongoose.Schema({
     currentRole: String,
 }, {collection: "users"});
 
-export default userSchema;
+const requestSchema = new mongoose.Schema({
+    id: { type: Number, required: true, unique: true },
+    userId: { type: Number, required: true },
+    firstName: { type: String, required: true },
+    lastName:{ type:  String, required: true },
+    username: { type: String, required: true },
+    requestedRole: { type: String, required: true },
+    completed: { type: Boolean, required: true }
+}, {collection: "requests"});
+
+export { userSchema, requestSchema };

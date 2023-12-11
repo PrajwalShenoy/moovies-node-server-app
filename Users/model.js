@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
-import schema from './schema.js';
+import { userSchema, requestSchema } from './schema.js';
 
-const model = mongoose.model("users", schema);
+const userModel = mongoose.model("users", userSchema);
+const requestModel = mongoose.model("requests", requestSchema);
 
-export default model;
+export { userModel, requestModel };
