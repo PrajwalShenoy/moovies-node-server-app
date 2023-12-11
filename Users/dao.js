@@ -54,13 +54,20 @@ export const updateUserCurrentRole = (userId, roles) => {
     });
 };
 
+export const removeUserRole = (userId, role) => {
+    userModel.updateOne({ id: userId }, { $pull: { role: role } })
+    .then((response) => {
+        console.log(response);
+    });
+};
+
 export const getRequests = async () => {
     const response = await requestModel.find({"completed": false});
     return response;
 }
 
 export const createRequest = async (request) => {
-    const pendingRequest = await requestModel.findOne({ "userId": request.userId, "requestedRole": request.requestedRole });
+    const pendingRequest = await requestModel.findOne({ "userId": request.userId, "requestedRole": request.requestedRole, "completed": false });
     if (pendingRequest) {
         return null;
     }

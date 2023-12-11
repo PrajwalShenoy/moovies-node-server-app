@@ -45,7 +45,7 @@ function UsersRoutes(app) {
     };
 
     const signoutUser = async (req, res) => {
-        dao.updateUserCurrentRole(req.session['currentUser'].id, req.session['currentUser'].currentRole);
+        await dao.updateUserCurrentRole(req.session['currentUser'].id, req.session['currentUser'].currentRole);
         req.session.destroy();
         res.sendStatus(204);
     };
@@ -60,14 +60,14 @@ function UsersRoutes(app) {
 
     const followUser = async (req, res) => {
         const { userId, followId } = req.params;
-        dao.followUser(userId, followId);
+        await dao.followUser(userId, followId);
         req.session['currentUser'].following.push(followId);
         res.status(200).send("User followed");
     };
 
     const unfollowUser = async (req, res) => {
         const { userId, followId } = req.params;
-        dao.unfollowUser(userId, followId);
+        await dao.unfollowUser(userId, followId);
         req.session['currentUser'].following = req.session['currentUser'].following.filter((f) => f !== followId);
         res.status(200).send("User unfollowed");
     };
@@ -142,9 +142,16 @@ function UsersRoutes(app) {
         }
     }
 
+    const removeUserRole = async (req, res) => {
+        const { role } = req.body;
+        const response = await dao.removeUserRole(req.session['currentUser'].id, role);
+        res.status(201).send(`Role removed - ${role}`);
+    };
+
 
     app.get("/api/requests", getAllPendingRequests);
     app.post("/api/requests", createRequest);
+    app.post("/api/deleterole", removeUserRole);
     app.post("/api/requests/:requestId", completeRequest);
     app.get("/api/users/roles/:userId", getUserRoles);
     app.post("/api/users/signin", signinUser);
