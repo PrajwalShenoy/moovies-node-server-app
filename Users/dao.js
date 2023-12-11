@@ -1,4 +1,4 @@
-import { userModel, requestModel } from './model.js';
+import { userModel, requestModel, reviewModel } from './model.js';
 
 export const getAllUsers = () => userModel.find();
 export const findUserByCredentials = (username, password) => {
@@ -88,3 +88,16 @@ export const updateRequest = async (requestId, approved) => {
         console.log(response);
     });
 }
+
+export const getReviewsByMovieId = async (movieId) => {
+    return reviewModel.find({ movieId: movieId });
+};
+
+export const createReview = async (review) => {
+    console.log(review);
+    return reviewModel.create(review);
+};
+
+export const deleteReview = async (reviewId) => {
+    return reviewModel.deleteOne({ id: reviewId });
+};

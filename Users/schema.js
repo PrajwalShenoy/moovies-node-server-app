@@ -25,4 +25,13 @@ const requestSchema = new mongoose.Schema({
     completed: { type: Boolean, required: true }
 }, {collection: "requests"});
 
-export { userSchema, requestSchema };
+const reviewSchema = new mongoose.Schema({
+                                              id: { type: Number, required: true, unique: true },
+                                              userId: { type: Number, required: true },
+                                             movieId: { type: Number, required: true },
+                                            review:{ type:  String, required: true },
+                                          }, {collection: "reviews"});
+
+
+
+export { userSchema, requestSchema, reviewSchema };

@@ -173,6 +173,45 @@ function UsersRoutes(app) {
         res.send(user);
     });
 
+    app.get('/api/reviews/:movieId', async (req, res) => {
+        const {movieId} = req.params;
+        try {
+            const reviews = await dao.getReviewsByMovieId(movieId);
+            res.json(reviews);
+        } catch (error) {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+// app.post('/api/reviews/', async (req, res) => {
+//     const review = req.body;
+//
+//     try {
+//         const newReview = await dao.createReview(review);
+//
+//     } catch (error) {
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+    app.post('/api/reviews', async (req, res) => {
+        let review = req.body;
+
+        try {
+            review = {
+                ...review,
+                id: generateUnqueNumber(),
+                userId: req.session["currentUser"].id
+            }
+            const newReview = await dao.createReview(review);
+            res.status(200);
+
+        } catch (error) {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+
 
 }
 export default UsersRoutes;
