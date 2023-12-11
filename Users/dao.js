@@ -94,11 +94,10 @@ export const updateRequest = async (requestId, approved) => {
 }
 
 export const getReviewsByMovieId = async (movieId) => {
-    return reviewModel.find({ movieId: movieId });
+    return reviewModel.find({ movieId: movieId }).sort({ _id: -1 });
 };
 
 export const createReview = async (review) => {
-    console.log(review);
     return reviewModel.create(review);
 };
 

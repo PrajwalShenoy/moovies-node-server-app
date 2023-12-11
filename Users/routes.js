@@ -74,20 +74,20 @@ function UsersRoutes(app) {
         res.status(200).send("User unfollowed");
     };
 
-    app.delete("/api/users/:id", (req, res) => {
-        const { id } = req.params;
-        Database.users = Database.users
-            .filter((c) => c._id !== id);
-        res.sendStatus(204);
-    });
-    app.put("/api/users/:id", (req, res) => {
-        const { id } = req.params;
-        const user = req.body;
-        Database.users = Database.users.map((c) =>
-            c._id === id ? { ...c, ...user } : c
-        );
-        res.sendStatus(204);
-    });
+    // app.delete("/api/users/:id", (req, res) => {
+    //     const { id } = req.params;
+    //     Database.users = Database.users
+    //         .filter((c) => c._id !== id);
+    //     res.sendStatus(204);
+    // });
+    // app.put("/api/users/:id", (req, res) => {
+    //     const { id } = req.params;
+    //     const user = req.body;
+    //     Database.users = Database.users.map((c) =>
+    //         c._id === id ? { ...c, ...user } : c
+    //     );
+    //     res.sendStatus(204);
+    // });
 
     const getUserRoles = async (req, res) => {
         const { userId } = req.params;
@@ -151,15 +151,14 @@ function UsersRoutes(app) {
     };
 
     const updateUserInfo = async (req, res) => {
-        console.log("here");
         const { userId } = req.params;
-        console.log("userID",userId);
         console.log(req.body);
         const status = await dao.updateUser(userId, req.body);
+        const currentUser = await dao.findUserByCredentials(req.body.username, req.body.password);
+        req.session['currentUser'] = currentUser;
         res.json(status);
     };
 
-    app.put("/api/users/:userId", updateUserInfo);
     app.get("/api/requests", getAllPendingRequests);
     app.post("/api/requests", createRequest);
     app.post("/api/deleterole", removeUserRole);
@@ -172,7 +171,8 @@ function UsersRoutes(app) {
     app.post("/api/users/setrole", setCurrentRole);
     app.post("/api/users/:userId/follow/:followId", followUser);
     app.post("/api/users/:userId/unfollow/:followId", unfollowUser);
-
+    app.put("/api/users/:userId", updateUserInfo);
+    
 
 
     app.get("/api/users/:id", (req, res) => {
@@ -196,17 +196,6 @@ function UsersRoutes(app) {
         }
     });
 
-// app.post('/api/reviews/', async (req, res) => {
-//     const review = req.body;
-//
-//     try {
-//         const newReview = await dao.createReview(review);
-//
-//     } catch (error) {
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
-
     app.post('/api/reviews', async (req, res) => {
         let review = req.body;
 
@@ -214,10 +203,12 @@ function UsersRoutes(app) {
             review = {
                 ...review,
                 id: generateUnqueNumber(),
-                userId: req.session["currentUser"].id
+                userId: req.session["currentUser"].id,
+                username: req.session["currentUser"].username,
             }
+            // const newReview = await dao.createReview(review);
             const newReview = await dao.createReview(review);
-            res.status(200);
+            res.status(200).json(newReview);
 
         } catch (error) {
             res.status(500).json({ error: 'Internal Server Error' });
