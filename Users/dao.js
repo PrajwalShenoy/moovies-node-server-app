@@ -6,9 +6,8 @@ export const findUserByCredentials = (username, password) => {
 };
 export const createUser = (user) => userModel.create(user);
 
-export const updateUser = (userId, user) =>{
+export const updateUser = (userId, user) =>
     userModel.updateOne({ id: userId }, { $set: user });
-
 
 export const addToWatchlist = (userId, movieId) => {
     return userModel.updateOne({ id: userId }, { $push: { watchlist: movieId } })
